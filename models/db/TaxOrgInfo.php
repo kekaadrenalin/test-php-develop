@@ -47,6 +47,7 @@ class TaxOrgInfo extends ActiveRecord
             [['arrear_id'], 'default', 'value' => null],
             [['arrear_id'], 'integer'],
             [['reportAcrualDate'], 'safe'],
+            [['totalArrear', 'totalTaxArrear', 'pensionContributionArrear', 'socialContributionArrear', 'socialHealthInsuranceArrear', 'appealledAmount', 'modifiedTermsAmount', 'rehabilitaionProcedureAmount'], 'default', 'value' => 0],
             [['totalArrear', 'totalTaxArrear', 'pensionContributionArrear', 'socialContributionArrear', 'socialHealthInsuranceArrear', 'appealledAmount', 'modifiedTermsAmount', 'rehabilitaionProcedureAmount'], 'number'],
             [['nameRu', 'nameKk'], 'string', 'max' => 255],
             [['charCode'], 'string', 'max' => 10],

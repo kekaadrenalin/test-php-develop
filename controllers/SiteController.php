@@ -144,7 +144,7 @@ class SiteController extends Controller
 
                                     $response = [
                                         'success' => 'ok',
-                                        'uri'     => Url::to(['site/index']),
+                                        'uri'     => Url::to(['arrears/index']),
                                     ];
                                 }
                             }

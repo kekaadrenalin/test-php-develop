@@ -37,14 +37,27 @@ class Arrears extends ActiveRecord
     }
 
     /**
+     * @param int $id
+     *
+     * @return Arrears|array|ActiveRecord|null
+     */
+    public static function findOneWithAll(int $id)
+    {
+        return static::find()
+            ->with('taxOrgInfos.taxPayerInfos.bccArrearsInfos')
+            ->where(['id' => $id])
+            ->one();
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function rules()
     {
         return [
             [['user_id', 'iinBin', 'nameRu', 'nameKk', 'sendTime'], 'required'],
-            [['user_id'], 'default', 'value' => null],
             [['user_id'], 'integer'],
+            [['totalArrear', 'totalTaxArrear', 'pensionContributionArrear', 'socialContributionArrear', 'socialHealthInsuranceArrear', 'appealledAmount', 'modifiedTermsAmount', 'rehabilitaionProcedureAmount'], 'default', 'value' => 0],
             [['totalArrear', 'totalTaxArrear', 'pensionContributionArrear', 'socialContributionArrear', 'socialHealthInsuranceArrear', 'appealledAmount', 'modifiedTermsAmount', 'rehabilitaionProcedureAmount'], 'number'],
             [['sendTime'], 'safe'],
             [['iinBin'], 'string', 'max' => 12],

@@ -24,15 +24,15 @@ class m191213_080834_create_arrears_table extends Migration
             'nameRu' => $this->string()->notNull(),
             'nameKk' => $this->string()->notNull(),
 
-            'totalArrear'                 => $this->decimal(12, 2)->defaultValue(0),
-            'totalTaxArrear'              => $this->decimal(12, 2)->defaultValue(0),
-            'pensionContributionArrear'   => $this->decimal(12, 2)->defaultValue(0),
-            'socialContributionArrear'    => $this->decimal(12, 2)->defaultValue(0),
-            'socialHealthInsuranceArrear' => $this->decimal(12, 2)->defaultValue(0),
+            'totalArrear'                 => $this->decimal(12, 2)->notNull()->defaultValue(0),
+            'totalTaxArrear'              => $this->decimal(12, 2)->notNull()->defaultValue(0),
+            'pensionContributionArrear'   => $this->decimal(12, 2)->notNull()->defaultValue(0),
+            'socialContributionArrear'    => $this->decimal(12, 2)->notNull()->defaultValue(0),
+            'socialHealthInsuranceArrear' => $this->decimal(12, 2)->notNull()->defaultValue(0),
 
-            'appealledAmount'              => $this->decimal(12, 2)->defaultValue(0),
-            'modifiedTermsAmount'          => $this->decimal(12, 2)->defaultValue(0),
-            'rehabilitaionProcedureAmount' => $this->decimal(12, 2)->defaultValue(0),
+            'appealledAmount'              => $this->decimal(12, 2)->notNull()->defaultValue(0),
+            'modifiedTermsAmount'          => $this->decimal(12, 2)->notNull()->defaultValue(0),
+            'rehabilitaionProcedureAmount' => $this->decimal(12, 2)->notNull()->defaultValue(0),
 
             'sendTime' => $this->timestamp()->notNull(),
         ]);

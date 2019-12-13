@@ -39,7 +39,8 @@ AppAsset::register($this);
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav navbar-right'],
         'items'   => [
-            ['label' => 'Home', 'url' => ['/site/index']],
+            ['label' => 'Запросить данные', 'url' => ['/site/index']],
+            ['label' => 'Сохраненные данные', 'url' => ['/arrears/index']],
             Yii::$app->user->isGuest ? (
             ['label' => 'Login', 'url' => ['/site/login']]
             ) : (
@@ -68,7 +69,7 @@ AppAsset::register($this);
 
 <footer class="footer">
     <div class="container">
-        <p class="pull-left">Тестовое задание</p>
+        <p class="pull-left"><?= Yii::$app->name ?></p>
     </div>
 </footer>
 

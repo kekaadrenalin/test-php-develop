@@ -41,6 +41,7 @@ class BccArrearsInfo extends ActiveRecord
             [['tax_payer_info_id', 'bcc', 'bccNameRu', 'bccNameKz'], 'required'],
             [['tax_payer_info_id'], 'default', 'value' => null],
             [['tax_payer_info_id'], 'integer'],
+            [['taxArrear', 'poenaArrear', 'percentArrear', 'fineArrear', 'totalArrear'], 'default', 'value' => 0],
             [['taxArrear', 'poenaArrear', 'percentArrear', 'fineArrear', 'totalArrear'], 'number'],
             [['bcc', 'bccNameRu', 'bccNameKz'], 'string', 'max' => 255],
             [['tax_payer_info_id'], 'exist', 'skipOnError' => true, 'targetClass' => TaxPayerInfo::class, 'targetAttribute' => ['tax_payer_info_id' => 'id']],

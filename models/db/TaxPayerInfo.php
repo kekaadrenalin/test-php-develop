@@ -38,6 +38,7 @@ class TaxPayerInfo extends ActiveRecord
             [['tax_org_info_id', 'nameRu', 'nameKk', 'iinBin'], 'required'],
             [['tax_org_info_id'], 'default', 'value' => null],
             [['tax_org_info_id'], 'integer'],
+            [['totalArrear'], 'default', 'value' => 0],
             [['totalArrear'], 'number'],
             [['nameRu', 'nameKk'], 'string', 'max' => 255],
             [['iinBin'], 'string', 'max' => 12],
