@@ -26,7 +26,7 @@ apt-get update
 apt-get upgrade -y
 
 info "Install additional software"
-apt-get install -y php7.0-curl php7.0-cli php7.0-intl php7.0-pgsql php7.0-gd php7.0-fpm php7.0-mbstring php7.0-xml unzip nginx php.xdebug
+apt-get install -y php7.0-curl php7.0-cli php7.0-intl php7.0-pgsql php7.0-gd php7.0-fpm php7.0-mbstring php7.0-xml php7.0-zip unzip nginx php.xdebug
 apt-get install -y postgresql postgresql-contrib
 
 info "Install and Configure PgSQL"
@@ -57,6 +57,7 @@ bash -c "$var"
 # create user + db
 su postgres -c "psql -c \"CREATE ROLE vagrant SUPERUSER LOGIN PASSWORD 'vagrant'\" "
 su postgres -c "createdb -E UTF8 -T template0 --locale=en_US.utf8 -O vagrant vagrant"
+su postgres -c "createdb -E UTF8 -T template0 --locale=en_US.utf8 -O vagrant vagrant_test"
 # restart
 /etc/init.d/postgresql restart
 echo "Done!"
