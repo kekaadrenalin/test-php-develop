@@ -3,17 +3,24 @@
 namespace app\controllers;
 
 use Yii;
+use Exception;
 
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 
+use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\Response;
+
+use app\components\ApiComponent;
 
 use app\models\LoginForm;
 use app\models\forms\MainForm;
 
-use app\components\ApiComponent;
+use app\models\db\Arrears;
+use app\models\db\BccArrearsInfo;
+use app\models\db\TaxOrgInfo;
+use app\models\db\TaxPayerInfo;
 
 /**
  * Class SiteController
@@ -29,10 +36,10 @@ class SiteController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::class,
-                'only'  => ['index', 'logout'],
+                'only'  => ['index', 'logout', 'save-answer'],
                 'rules' => [
                     [
-                        'actions' => ['index', 'logout'],
+                        'actions' => ['index', 'logout', 'save-answer'],
                         'allow'   => true,
                         'roles'   => ['@'],
                     ],
@@ -74,6 +81,8 @@ class SiteController extends Controller
                 $api = new ApiComponent($model->iin);
 
                 $answer = $api->send();
+
+                Yii::$app->session->set('currentAnswer', $answer);
             }
         }
 
@@ -81,6 +90,78 @@ class SiteController extends Controller
             'model'  => $model,
             'answer' => $answer,
         ]);
+    }
+
+    /**
+     * Save current data.
+     *
+     * @return array
+     */
+    public function actionSaveAnswer()
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+
+        $answer = Yii::$app->session->get('currentAnswer', []);
+        if (!$answer) {
+            return ['error' => 'empty answer'];
+        }
+
+        $transaction = Yii::$app->db->beginTransaction();
+        $response = ['error' => 'unknown error'];
+
+        try {
+            $arrears = new Arrears;
+            $arrears->attributes = $answer;
+
+            $arrears->user_id = Yii::$app->user->id;
+            $arrears->sendTime = Yii::$app->formatter->asDatetime((int)round($answer['sendTime'] / 1000), 'php:Y-m-d H:i:s');
+
+            $validSave = $arrears->save();
+
+            if ($validSave && !empty($answer['taxOrgInfo'])) {
+                foreach ($answer['taxOrgInfo'] as $taxOrgInfo) {
+                    $newTaxOrg = new TaxOrgInfo;
+                    $newTaxOrg->attributes = $taxOrgInfo;
+                    $newTaxOrg->reportAcrualDate = Yii::$app->formatter->asDatetime((int)round($taxOrgInfo['reportAcrualDate'] / 1000), 'php:Y-m-d H:i:s');
+
+                    $newTaxOrg->link('arrear', $arrears);
+
+                    if (!empty($taxOrgInfo['taxPayerInfo'])) {
+                        foreach ($taxOrgInfo['taxPayerInfo'] as $taxPayerInfo) {
+                            $newTaxPayer = new TaxPayerInfo;
+                            $newTaxPayer->attributes = $taxPayerInfo;
+
+                            $newTaxPayer->link('taxOrgInfo', $newTaxOrg);
+
+                            if (!empty($taxPayerInfo['bccArrearsInfo'])) {
+                                foreach ($taxPayerInfo['bccArrearsInfo'] as $bccArrearsInfo) {
+                                    $newBccInfo = new BccArrearsInfo;
+                                    $newBccInfo->attributes = $bccArrearsInfo;
+
+                                    $newBccInfo->link('taxPayerInfo', $newTaxPayer);
+
+                                    $transaction->commit();
+
+                                    $response = [
+                                        'success' => 'ok',
+                                        'uri'     => Url::to(['site/index']),
+                                    ];
+                                }
+                            }
+
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception $e) {
+            Yii::error($e->getMessage(), __METHOD__);
+            $transaction->rollBack();
+
+            $response = ['error' => 'not valid answer'];
+        }
+
+        return $response;
     }
 
     /**
