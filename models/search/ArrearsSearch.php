@@ -59,9 +59,12 @@ class ArrearsSearch extends Arrears
         }
 
         // grid filtering conditions
+        $query->andWhere([
+            'user_id' => Yii::$app->user->id,
+        ]);
+
         $query->andFilterWhere([
             'id'                           => $this->id,
-            'user_id'                      => Yii::$app->user->id,
             'totalArrear'                  => $this->totalArrear,
             'totalTaxArrear'               => $this->totalTaxArrear,
             'pensionContributionArrear'    => $this->pensionContributionArrear,

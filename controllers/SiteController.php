@@ -14,7 +14,7 @@ use yii\web\Response;
 
 use app\components\ApiComponent;
 
-use app\models\LoginForm;
+use app\models\forms\LoginForm;
 use app\models\forms\MainForm;
 
 use app\models\db\Arrears;
@@ -175,7 +175,7 @@ class SiteController extends Controller
             return $this->goHome();
         }
 
-        $model = new LoginForm();
+        $model = new LoginForm;
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
             return $this->goBack();
         }

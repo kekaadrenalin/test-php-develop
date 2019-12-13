@@ -4,16 +4,20 @@ $params = require __DIR__ . '/params.php';
 $db = require __DIR__ . '/db.php';
 
 $config = [
-    'id'         => 'basic',
-    'basePath'   => dirname(__DIR__),
-    'bootstrap'  => ['log'],
-    'language'   => 'ru-RU',
-    'name'       => 'Тестовое задание',
-    'aliases'    => [
+    'id'        => 'basic',
+    'basePath'  => dirname(__DIR__),
+    'bootstrap' => ['log'],
+    'language'  => 'ru-RU',
+    'name'      => 'Тестовое задание',
+
+    'aliases' => [
         '@bower'  => '@vendor/bower-asset',
         '@npm'    => '@vendor/npm-asset',
         '@upload' => '@app/web/upload',
     ],
+
+    'defaultRoute' => 'arrears/index',
+
     'components' => [
         'request' => [
             'cookieValidationKey' => '1TwWpaH1GH08djGUXnXflB2267upa3De',
