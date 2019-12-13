@@ -2,8 +2,6 @@
 
 namespace app\controllers;
 
-use app\components\ApiComponent;
-use app\models\forms\MainForm;
 use Yii;
 
 use yii\filters\AccessControl;
@@ -13,6 +11,9 @@ use yii\web\Controller;
 use yii\web\Response;
 
 use app\models\LoginForm;
+use app\models\forms\MainForm;
+
+use app\components\ApiComponent;
 
 /**
  * Class SiteController
@@ -69,6 +70,8 @@ class SiteController extends Controller
 
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
             $api = new ApiComponent($model->iin);
+
+            return $api->send();
         }
 
         return $this->render('index', [

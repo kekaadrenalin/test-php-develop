@@ -2,7 +2,6 @@
 
 use yii\bootstrap\ActiveForm;
 use yii\bootstrap\Html;
-use yii\widgets\Pjax;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\forms\MainForm */
@@ -10,7 +9,6 @@ use yii\widgets\Pjax;
 $this->title = 'Главная страница';
 ?>
 <div class="site-index">
-    <?php Pjax::begin() ?>
 
     <div class="row">
         <div class="col-lg-5">
@@ -29,5 +27,4 @@ $this->title = 'Главная страница';
         </div>
     </div>
 
-    <?php Pjax::end() ?>
 </div>
