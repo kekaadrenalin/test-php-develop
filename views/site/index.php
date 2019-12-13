@@ -13,12 +13,13 @@ $this->title = 'Главная страница';
 
 $js = <<<'JS'
 var $pjaxBox = $('#pjax-box');
-$(document).on('pjax:send', function() {
-  $pjaxBox.find('#progress-bar').show();
-});
-$(document).on('pjax:complete', function() {
-  $pjaxBox.find('#progress-bar').hide();
-});
+$(document)
+  .on('pjax:send', function() {
+    $pjaxBox.find('#progress-bar').show();
+  })
+  .on('pjax:complete', function() {
+    $pjaxBox.find('#progress-bar').hide();
+  });
 JS;
 
 $this->registerJs($js, View::POS_READY);
