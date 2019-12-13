@@ -29,10 +29,10 @@ class SiteController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::class,
-                'only'  => ['logout'],
+                'only'  => ['index', 'logout'],
                 'rules' => [
                     [
-                        'actions' => ['logout'],
+                        'actions' => ['index', 'logout'],
                         'allow'   => true,
                         'roles'   => ['@'],
                     ],
@@ -67,15 +67,19 @@ class SiteController extends Controller
     public function actionIndex()
     {
         $model = new MainForm;
+        $answer = [];
 
-        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-            $api = new ApiComponent($model->iin);
+        if (Yii::$app->request->isPjax) {
+            if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+                $api = new ApiComponent($model->iin);
 
-            return $api->send();
+                $answer = $api->send();
+            }
         }
 
         return $this->render('index', [
-            'model' => $model,
+            'model'  => $model,
+            'answer' => $answer,
         ]);
     }
 
