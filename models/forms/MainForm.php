@@ -22,6 +22,7 @@ class MainForm extends Model
         return [
             ['iin', 'trim'],
             ['iin', 'required', 'message' => 'Поле обязательно к заполнению'],
+            ['iin', 'match', 'pattern' => '/^\d+$/i', 'message' => 'Некорректные символы в ИИН/БИН'],
             ['iin', 'string', 'length' => 12, 'notEqual' => 'Некорректная длина ИИН/БИН'],
             ['iin', 'validateIin'],
         ];
