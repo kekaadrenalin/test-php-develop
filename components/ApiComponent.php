@@ -30,6 +30,9 @@ class ApiComponent extends BaseObject
     /** @var string */
     protected $uuid;
 
+    /** @var int */
+    protected $counter = 0;
+
     /**
      * ApiComponent constructor.
      *
@@ -43,7 +46,11 @@ class ApiComponent extends BaseObject
         parent::__construct($config);
     }
 
-    public function send()
+    /**
+     * @return array
+     * @throws Exception
+     */
+    public function send(): array
     {
         $this->uuid = $this->generateUUID();
         $captchaText = $this->readCaptcha();
@@ -51,11 +58,16 @@ class ApiComponent extends BaseObject
         $answer = $this->request($captchaText);
 
         if (!empty($answer['captchaError'])) {
-            // ToDo
-            return var_dump($answer['captchaError']);
+            if ($this->counter > 2) {
+                throw new Exception('Возникла ошибка проверки каптчи');
+            }
+
+            $this->counter++;
+
+            return $this->send();
         }
 
-        return '<pre>' . print_r($answer, true) . '</pre>';
+        return $answer;
     }
 
     /**
@@ -123,7 +135,7 @@ class ApiComponent extends BaseObject
      * @return array
      * @throws Exception
      */
-    private function request(string $captchaText)
+    private function request(string $captchaText): array
     {
         $ch = curl_init();
 
