@@ -20,13 +20,14 @@ class ApiComponent extends BaseObject
 {
     const MAIN_URL = 'http://kgd.gov.kz/apps/services/culs-taxarrear-search-web/rest/search';
 
-    const CAPTCHA_URL = 'http://kgd.gov.kz/apps/services/CaptchaWeb/generate?';
+    const GET_CAPTCHA_URL = 'http://kgd.gov.kz/apps/services/CaptchaWeb/generate?';
 
     const API_KEY = '66f5fa58da14ec11bf8082004e0a82e4';
 
     /** @var string */
     protected $iin;
 
+    /** @var string */
     protected $uuid;
 
     /**
@@ -45,38 +46,7 @@ class ApiComponent extends BaseObject
     public function send()
     {
         $this->uuid = $this->generateUUID();
-        $t = $this->generateUUID();
-
-        $api = new ImageToText;
-        $api->setKey(self::API_KEY);
-
-        $captchaUrl = self::CAPTCHA_URL . http_build_query([
-                'uid' => $this->uuid,
-                't'   => $t,
-            ]);
-
-        $file = file_get_contents($captchaUrl);
-        $captchaFile = Yii::getAlias('@upload') . DIRECTORY_SEPARATOR . 'captcha';
-        file_put_contents($captchaFile, $file);
-
-        $api->setFile($captchaFile);
-
-        if (!$api->createTask()) {
-            $api->debout('API v2 send failed - ' . $api->getErrorMessage(), 'red');
-
-            throw new Exception('Ошибка проверки каптчи');
-        }
-
-        $taskId = $api->getTaskId();
-
-        if (!$api->waitForResult()) {
-            $api->debout("could not solve captcha", "red");
-            $api->debout($api->getErrorMessage());
-
-            throw new Exception('Ошибка проверки каптчи');
-        } else {
-            $captchaText = $api->getTaskSolution();
-        }
+        $captchaText = $this->readCaptcha();
 
         $answer = $this->request($captchaText);
 
@@ -101,6 +71,50 @@ class ApiComponent extends BaseObject
 
             return ($matches[0] == 'x' ? $r : base_convert(($r & 0x3 | 0x8), 10, 16));
         }, 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx');
+    }
+
+    /**
+     * @return string
+     * @throws Exception
+     */
+    private function readCaptcha(): string
+    {
+        $t = $this->generateUUID();
+
+        $api = new ImageToText;
+        $api->setKey(self::API_KEY);
+
+        $captchaUrl = self::GET_CAPTCHA_URL . http_build_query([
+                'uid' => $this->uuid,
+                't'   => $t,
+            ]);
+
+        $captchaFile = Yii::getAlias('@upload') . DIRECTORY_SEPARATOR . 'captcha';
+
+        if (false === $remoteFile = file_get_contents($captchaUrl)) {
+            throw new Exception('Не удалось загрузить каптчу');
+        }
+
+        if (false === file_put_contents($captchaFile, $remoteFile)) {
+            throw new Exception('Не удалось сохранить каптчу');
+        }
+
+        $api->setFile($captchaFile);
+
+        if (!$api->createTask()) {
+            $api->debout('API v2 send failed - ' . $api->getErrorMessage(), 'red');
+
+            throw new Exception('Ошибка создания задачи проверки каптчи');
+        }
+
+        if (!$api->waitForResult()) {
+            $api->debout('could not solve captcha', 'red');
+            $api->debout($api->getErrorMessage());
+
+            throw new Exception('Ошибка проверки каптчи');
+        }
+
+        return $api->getTaskSolution();
     }
 
     /**
@@ -139,7 +153,7 @@ class ApiComponent extends BaseObject
         $result = curl_exec($ch);
         $curlError = curl_error($ch);
 
-        if ($curlError != "") {
+        if ($curlError != '') {
             throw new Exception("Curl error: $curlError");
         }
 
