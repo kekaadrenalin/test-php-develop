@@ -73,6 +73,8 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
+        $this->layout = 'request';
+
         $model = new MainForm;
         $answer = [];
 
@@ -80,9 +82,13 @@ class SiteController extends Controller
             if ($model->load(Yii::$app->request->post()) && $model->validate()) {
                 $api = new ApiComponent($model->iin);
 
-                $answer = $api->send();
-
-                Yii::$app->session->set('currentAnswer', $answer);
+                try {
+                    $answer = $api->send();
+                    Yii::$app->session->set('currentAnswer', $answer);
+                }
+                catch (Exception $e) {
+                    Yii::$app->session->addFlash('error', 'Возникла ошибка отправки данных на сторонний ресурс. Попробуйте снова!');
+                }
             }
         }
 

@@ -4,43 +4,18 @@ use yii\bootstrap\ActiveForm;
 use yii\bootstrap\Html;
 use yii\helpers\Url;
 use yii\web\View;
-use yii\widgets\Pjax;
 
 /* @var $model app\models\forms\MainForm */
 /* @var $this View */
 /* @var $answer array */
 
-$this->title = 'Главная страница';
-
-$js = <<<'JS'
-var $pjaxBox = $('#pjax-box');
-$(document)
-  .on('pjax:send', function() {
-    $pjaxBox.find('#progress-bar').show();
-    $pjaxBox.find('#result-box').html('');
-  })
-  .on('pjax:complete', function() {
-    $pjaxBox.find('#progress-bar').hide();
-  });
-$pjaxBox.on('click', '#btn-save', function(e) {
-  e.preventDefault();
-  $.get($(this).data('target'), function(r) {
-    if (r.success === 'ok') {
-      window.location = r.uri;
-    } else {
-      alert('Возникла ошибка');
-    }
-  })
-})
-JS;
-
-$this->registerJs($js, View::POS_READY);
+$this->title = 'Запросить данные';
 ?>
 <div class="site-index">
-    <?php Pjax::begin(['id' => 'pjax-box']) ?>
     <div class="row">
         <div class="col-lg-4">
             <?php $form = ActiveForm::begin([
+                'id'      => 'main-form',
                 'options' => [
                     'data' => ['pjax' => true],
                 ],
@@ -52,7 +27,7 @@ $this->registerJs($js, View::POS_READY);
             ]) ?>
 
             <div class="form-group">
-                <?= Html::submitButton('Получить результат', ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
+                <?= Html::submitButton('Получить результат', ['class' => 'btn btn-primary btn-send', 'name' => 'login-button']) ?>
             </div>
 
             <?php ActiveForm::end() ?>
@@ -77,6 +52,4 @@ $this->registerJs($js, View::POS_READY);
             </div>
         </div>
     <?php endif; ?>
-
-    <?php Pjax::end() ?>
 </div>

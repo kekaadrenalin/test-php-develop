@@ -7,6 +7,7 @@ use DateTime;
 
 use yii\base\BaseObject;
 use yii\base\Exception;
+use yii\base\InvalidArgumentException;
 
 use yii\helpers\Json;
 
@@ -171,6 +172,15 @@ class ApiComponent extends BaseObject
 
         curl_close($ch);
 
-        return Json::decode($result);
+        try {
+            $data = Json::decode($result);
+        }
+        catch (InvalidArgumentException $e) {
+            Yii::error('Server return: ' . $result, __METHOD__);
+
+            throw new Exception('Curl return not valid json');
+        }
+
+        return $data;
     }
 }
