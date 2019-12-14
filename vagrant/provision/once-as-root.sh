@@ -26,8 +26,27 @@ apt-get update
 apt-get upgrade -y
 
 info "Install additional software"
-apt-get install -y php7.0-curl php7.0-cli php7.0-intl php7.0-pgsql php7.0-gd php7.0-fpm php7.0-mbstring php7.0-xml php7.0-zip unzip nginx php.xdebug
+apt-get install -y php7.0-curl php7.0-cli php7.0-intl php7.0-pgsql php7.0-gd php7.0-fpm php7.0-mbstring php7.0-xml php7.0-zip
+apt-get install -y unzip nginx php.xdebug default-jdk
 apt-get install -y postgresql postgresql-contrib
+
+info "Download latest selenium server"
+SELENIUM_VERSION=$(curl "https://selenium-release.storage.googleapis.com/" | perl -n -e'/.*<Key>([^>]+selenium-server-standalone-2[^<]+)/ && print $1')
+wget "https://selenium-release.storage.googleapis.com/${SELENIUM_VERSION}" -O selenium-server-standalone.jar
+chown vagrant:vagrant selenium-server-standalone.jar
+
+info "Download the latest chrome"
+wget "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb"
+dpkg -i google-chrome-stable_current_amd64.deb
+rm google-chrome-stable_current_amd64.deb
+apt-get install -y -f
+
+info "Download latest chrome driver"
+CHROMEDRIVER_VERSION=$(curl "http://chromedriver.storage.googleapis.com/LATEST_RELEASE")
+wget "http://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip"
+unzip chromedriver_linux64.zip
+rm chromedriver_linux64.zip
+chown vagrant:vagrant chromedriver
 
 info "Install and Configure PgSQL"
 ver="$(sudo psql --version)"

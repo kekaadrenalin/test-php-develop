@@ -6,11 +6,13 @@ use Yii;
 use DateTime;
 
 use yii\base\BaseObject;
+use yii\base\DynamicModel;
 use yii\base\Exception;
 use yii\base\InvalidArgumentException;
 
 use yii\helpers\Json;
 
+use app\components\validators\IinValidator;
 use app\components\anticaptcha\ImageToText;
 
 /**
@@ -44,6 +46,18 @@ class ApiComponent extends BaseObject
     {
         $this->iin = $iin;
 
+        $model = DynamicModel::validateData(compact('iin'), [
+            ['iin', 'trim'],
+            ['iin', 'required', 'message' => 'Поле обязательно к заполнению'],
+            ['iin', 'match', 'pattern' => '/^\d+$/i', 'message' => 'Некорректные символы в ИИН/БИН'],
+            ['iin', 'string', 'length' => 12, 'notEqual' => 'Некорректная длина ИИН/БИН'],
+            ['iin', IinValidator::class],
+        ]);
+
+        if ($model->hasErrors()) {
+            throw new Exception('Некорректный ИИН/БИН');
+        }
+
         parent::__construct($config);
     }
 
@@ -60,7 +74,7 @@ class ApiComponent extends BaseObject
 
         if (!empty($answer['captchaError'])) {
             if ($this->counter > 2) {
-                throw new Exception('Возникла ошибка проверки каптчи');
+                throw new Exception('Возникла ошибка запроса данных');
             }
 
             $this->counter++;
